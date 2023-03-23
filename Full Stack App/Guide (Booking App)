@@ -1,0 +1,19 @@
+Following steps for make app
+
+	parent 95c0ff0 commit 4f143a0
+
+1. Change the path into Appointment Booking App.
+	crud crud   ---->   localhost:4000  with routes path
+	Ex. axios.post('http://localhost:4000/user/add-user', myObj)
+
+2. Import Sequelize database
+	 In util folder create databse.js
+
+3. Initialise user table field In models --> define user (user.js)
+
+4. Install cors 
+	npm i cors
+
+5. import Cors (for cross origin request) in Main app.js
+
+6. Write code in app.js like getUser, POST user
