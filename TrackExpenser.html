@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker App</title>
+</head>
+<body>
+    <h1>Expense Tracker App</h1>
+    <form>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+        <label>Choose expense</label>
+        <input type="number" name="expensenumber" id="expense">
+        <label>Choose description</label>
+        <input type="text" name="description" id="info">
+        <label>Choose a category</label>
+        <select name="" id="category">
+            <option value="Movie">Movie</option>
+            <option value="Fuel">Fuel</option>
+            <option value="Food">Food</option>
+            <option value="Buy">Buy</option>
+        </select>
+        <input type="submit" id="submit" value="Add Expense">
+    </form>
+    
+    <ul id="listOfUsers"></ul>
+    <script>
+        var submitButton = document.getElementById("submit");  // Get Add Expense button 
+        submitButton.addEventListener('click', saveLocal);  // click on Add Expense button 
+
+        function saveLocal(e) {
+            e.preventDefault();
+            var expense = document.getElementById("expense").value;  // Get expense of user
+            var category = document.getElementById("category").value;  // // Get value of category
+            var info = document.getElementById("info").value;  // Get description of expense
+
+            // Creating object for store multiple values
+            const myObj = {
+                expense: expense,
+                category: category,
+                info: info
+            };
+
+            // Crudcrud
+            axios.post("https://crudcrud.com/api/e6a255d51d5a41d78021a0c5de665468/expenseData", myObj)
+                .then((response) => {
+                    showNewExpense(response.data)
+                })
+                .catch((err) => {
+                    document.body.innerHTML += "<h4> Something wents wrong </h4>"
+                    console.log(err)
+                });
+
+            // set localStorage key as a variable i.e. description
+            // localStorage.setItem(myObj.info, JSON.stringify(myObj)); // converted into string
+            // showNewExpense(myObj);
+        }
+
+        // When page refesh DOM Content Loaded
+        window.addEventListener("DOMContentLoaded", () => {
+
+            // Crudcrud
+            const data = axios.get("https://crudcrud.com/api/e6a255d51d5a41d78021a0c5de665468/expenseData")
+                .then((respone) => {
+                    for (let i = 0; i < respone.data.length; i++) {
+                        showNewExpense(respone.data[i]);
+                    }
+                })
+                .catch(err => console.log(err));
+
+            console.log(data);
+
+
+
+            // const localStorageKeys = Object.keys(localStorage);
+
+            // for (let i = 0; i < localStorageKeys.length; i++) {
+            //     const key = localStorageKeys[i];
+            //     const userDetailsString = localStorage[key];
+            //     const userDetailsObj = JSON.parse(userDetailsString);  // converted into object
+            //     showNewExpense(userDetailsObj);
+            // }
+        });
+
+        function showNewExpense(myObj) {
+            var ul = document.getElementById('listOfUsers');  // get element or item by id, class, query, tag
+            var li = document.createElement("li");
+
+            // Add value in li
+            li.appendChild(document.createTextNode(myObj.expense + " - " + myObj.category + " - " + myObj.info + " "));
+
+            // Create delete button element
+            var deleteBtn = document.createElement('button');
+            // Append text node
+            deleteBtn.appendChild(document.createTextNode('Delete Expense'));
+            // Append button to li
+            li.appendChild(deleteBtn);
+
+            // Add Space b/w delete & edit
+            li.appendChild(document.createTextNode(" "));
+
+            // Click on delete button
+            deleteBtn.addEventListener("click", function () {
+                // console.log(myObj.info);
+
+                // Crudcrud
+                axios.delete(`https://crudcrud.com/api/e6a255d51d5a41d78021a0c5de665468/expenseData/${myObj._id}`)
+                    .then(() => console.log(myObj.info))
+                    .catch((err) => {
+                        document.body.innerHTML += "<h4> Something wents wrong </h4>"
+                        console.log(err)
+                    });
+                // localStorage.removeItem(myObj.info);  // remove value from localStorage
+                li.remove();  // remove list node
+            });
+
+
+            // Create Edit button element
+            var editBtn = document.createElement('button');
+            // Append text node
+            editBtn.appendChild(document.createTextNode('Edit Expense'));
+            // Append button to li
+            li.appendChild(editBtn);
+
+            // Click on Edit button
+            editBtn.addEventListener("click", function () {
+                console.log(myObj);
+                document.getElementById("expense").value = myObj.expense;   // Get values
+                document.getElementById("category").value = myObj.category;
+                document.getElementById("info").value = myObj.info;
+
+
+                // Crudcrud
+                axios.delete(`https://crudcrud.com/api/e6a255d51d5a41d78021a0c5de665468/expenseData/${myObj._id}`)
+                    .then()
+                    .catch((err) => {
+                        document.body.innerHTML += "<h4> Something wents wrong </h4>"
+                        console.log(err)
+                    });
+
+
+                li.remove();  // remove list node
+            });
+
+            // Append li to itemList
+            ul.appendChild(li);
+
+            // Clear field of HTML
+            expense.value = '';
+            category.value = '';
+            info.value = '';
+        }
+    </script>
+</body>
+
+</html>
