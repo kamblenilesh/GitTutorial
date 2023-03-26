@@ -4,7 +4,7 @@ const expenseController = require('../controllers/expensectr');
 
 const router = express.Router();
 
-// /admin/add-product => GET
+// /expenses/add-expense => POST
 router.post('/add-expense', expenseController.postAddExpense);
 
 router.get('/get-expenses', expenseController.getAllExpenses);
