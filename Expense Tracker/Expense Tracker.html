@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker App</title>
+</head>
+
+<body>
+    <h1>Expense Tracker App</h1>
+    <form>
+        <label>Choose expense</label>
+        <input type="number" name="expensenumber" id="expenseamt">
+        <label>Choose description</label>
+        <input type="text" name="description" id="info">
+        <label>Choose Category</label>
+        <select name="selectcategory" id="category">
+            <option value="Movie">Movie</option>
+            <option value="Fuel">Fuel</option>
+            <option value="Food">Food</option>
+            <option value="Buy">Buy</option>
+        </select>
+        <input type="submit" id="submit" value="Submit">
+    </form>
+    <ul id="listOfExpenses"></ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+    <script>
+        var submitButton = document.getElementById("submit");  // Get submit button 
+        submitButton.addEventListener('click', saveLocal);  // click on submit button 
+
+        function saveLocal(e) {
+            e.preventDefault();
+            var expenseamt = document.getElementById("expenseamt").value;  // Get expense of user
+            var info = document.getElementById("info").value;  // Get value of info
+            var category = document.getElementById("category").value;  // // Get value of email
+
+            // Creating object for store multiple values
+            const myObj = {
+                expenseamt: expenseamt,
+                info: info,
+                category: category
+            };
+
+
+            axios.post('http://localhost:4000/expenses/add-expense', myObj)
+                .then((response) => {
+                    console.log(response);
+                    showNewExpense(response.data.newExpenseDetail);
+                })
+                .catch((err) => {
+                    document.body.innerHTML += "<h4> Something wents wrong </h4>"
+                    console.log(err)
+                })
+        }
+
+        // When page refesh DOM Content Loaded
+        window.addEventListener("DOMContentLoaded", () => {
+
+            const data = axios.get("http://localhost:4000/expenses/get-expenses")
+                .then((response) => {
+                    for (let i = 0; i < response.data.allExpenses.length; i++) {
+                        showNewExpense(response.data.allExpenses[i])
+                    }
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+
+            console.log(data);
+        });
+
+        function showNewExpense(myObj) {
+            var ul = document.getElementById('listOfExpenses');  // get element or item by id, class, query, tag
+            var li = document.createElement("li");
+
+            // Add value in li
+            li.appendChild(document.createTextNode(myObj.expenseamt + " " + myObj.info + " " + myObj.category + " "));
+
+            // Create Edit button element
+            var editBtn = document.createElement('button');
+            // Append text node
+            editBtn.appendChild(document.createTextNode('Edit'));
+            // Append button to li
+            li.appendChild(editBtn);
+
+            // Click on Edit button
+            editBtn.addEventListener("click", function () {
+                console.log(myObj);
+                document.getElementById("expenseamt").value = myObj.expenseamt;
+                document.getElementById("info").value = myObj.info;  // Get values
+                document.getElementById("category").value = myObj.category;
+
+                axios.delete(`http://localhost:4000/expenses/delete-expense/${myObj.id}`);
+                li.remove();  // remove list node
+            });
+
+            // space b/w button
+            li.append("  ");
+
+            // Create delete button element
+            var deleteBtn = document.createElement('button');
+            // Append text node
+            deleteBtn.appendChild(document.createTextNode('Delete'));
+            // Append button to li
+            li.appendChild(deleteBtn);
+
+            // Click on delete button
+            deleteBtn.addEventListener("click", function () {
+                console.log(myObj.category);
+
+                axios.delete(`http://localhost:4000/expenses/delete-expense/${myObj.id}`);
+                li.remove();  // remove list node
+            });
+
+            // Append li to itemList
+            ul.appendChild(li);
+
+            // Clear field of HTML
+            expenseamt.value = '';
+            info.value = '';
+            category.value = '';
+        }
+    </script>
+</body>
+
+</html>
